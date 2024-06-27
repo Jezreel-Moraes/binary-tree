@@ -121,6 +121,7 @@ void adicionaChaveNo(No* no, No* novo, int chave) {
   contador++;
 
   for (int j = no->total - 1; j >= i; j--) {
+    contador++;
     no->chaves[j + 1] = no->chaves[j];
     no->filhos[j + 2] = no->filhos[j + 1];
   }
@@ -169,8 +170,6 @@ void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
     No* novo = divideNo(arvore, no);
 
     if (no->pai == NULL) {
-      contador++;
-
       No* pai = criaNo(arvore);
       pai->filhos[0] = no;
       adicionaChaveNo(pai, novo, promovido);
@@ -178,8 +177,10 @@ void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
       no->pai = pai;
       novo->pai = pai;
       arvore->raiz = pai;
-    } else
+    } else {
       adicionaChaveRecursivo(arvore, no->pai, novo, promovido);
+    }
+    contador++;
   }
 }
 
@@ -190,34 +191,29 @@ void adicionaChave(ArvoreB* arvore, int chave) {
 }
 
 int main() {
-  clock_t start = clock();
-  ArvoreB* arvore = criaArvore(1);
+  for (int j = 0; j < 30; j++) {
+    ArvoreB* arvore = criaArvore(1);
+    sleep(1);
+    srand(time(0));
 
-  contador = 0;
+    contador = 0;
 
-  for (int i = 0; i < 10000; i++) {
-    int operacao = 0;
-    int valor = rand() % 100000;
+    for (int i = 0; i < 10000; i++) {
+      int operacao = 0;
+      int valor = rand() % 100000;
 
-    switch (operacao) {
-      case 0:
-        adicionaChave(arvore, valor);
-        break;
-        // case 1:
-        //   remover(a, valor);
-        //   break;
-        // case 2:
-        //   if (localizar(a->raiz, valor) != NULL) {
-        //     printf("Valor %d encontrado na arvore.\n", valor);
-        //   } else {
-        //     printf("Valor %d nao encontrado na arvore.\n", valor);
-        //   }
-        //   break;
+      switch (operacao) {
+        case 0:
+          adicionaChave(arvore, valor);
+          break;
+          // case 1:
+          //   remover(a, valor);
+          //   break;
+      }
     }
+
+    //   percorreArvore(arvore->raiz);
+    printf("\nNumero de operacoes: %d\n", contador);
+    contador = 0;
   }
-
-  percorreArvore(arvore->raiz);
-
-  printf("\nNúmero de operações: %d\n", contador);
-  printf("\ntempo: %.0f Milissegundos\n", (double)(clock() - start));
 }

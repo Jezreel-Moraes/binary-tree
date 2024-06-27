@@ -223,7 +223,6 @@ void rotacionarDireita(Arvore* arvore, No* no) {
 }
 
 int main() {
-  clock_t start = clock();
   Arvore* a = criar();
 
   for (int i = 0; i < 1000; i++) {
@@ -237,19 +236,11 @@ int main() {
         // case 1:
         //   remover(a, valor);
         //   break;
-        // case 2:
-        //   if (localizar(a->raiz, valor) != NULL) {
-        //     printf("Valor %d encontrado na arvore.\n", valor);
-        //   } else {
-        //     printf("Valor %d nao encontrado na arvore.\n", valor);
-        //   }
-        //   break;
     }
   }
 
   printf("In-order: ");
   percorrerProfundidadeInOrder(a, a->raiz, visitar);
-  printf("\ntempo: %.0f Milissegundos\n", (double)(clock() - start));
 
   return 0;
 }
