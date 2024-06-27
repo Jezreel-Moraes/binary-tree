@@ -19,8 +19,8 @@ typedef struct arvore {
 void balanceamento(Arvore*, No*);
 int altura(No*);
 int fb(No*);
-No* rsd(Arvore*, No*, bool makePrint);
-No* rse(Arvore*, No*, bool makePrint);
+No* rsd(Arvore*, No*);
+No* rse(Arvore*, No*);
 No* rdd(Arvore*, No*);
 No* rde(Arvore*, No*);
 
@@ -36,7 +36,6 @@ Arvore* criar() {
 int vazia(Arvore* arvore) { return arvore->raiz == NULL; }
 
 void adicionar(Arvore* arvore, int valor) {
-  clock_t start = clock();
   No* no = arvore->raiz;
 
   while (no != NULL) {
@@ -71,15 +70,11 @@ void adicionar(Arvore* arvore, int valor) {
       no->esquerda = novo;
     }
 
-    printf("Adicionando %d -> tempo: %.0f Milissegundos\n", valor,
-           (double)(clock() - start));
-
     balanceamento(arvore, no);
   }
 }
 
 No* localizar(No* no, int valor) {
-  clock_t start = clock();
   while (no != NULL) {
     if (no->valor == valor) {
       return no;
@@ -88,8 +83,6 @@ No* localizar(No* no, int valor) {
     no = valor < no->valor ? no->esquerda : no->direita;
   }
 
-  printf("Buscando %d -> tempo: %.0f Milissegundos\n", valor,
-         (double)(clock() - start));
   return NULL;
 }
 
@@ -112,8 +105,8 @@ void balanceamento(Arvore* arvore, No* no) {
       // rotação para a direita
       if (fb(no->esquerda) > 0) {
         printf("RSD %d -> ", no->valor);
-        rsd(arvore, no, true);  // rotação simples a direita, pois o FB do filho
-                                // tem sinal igual
+        rsd(arvore, no);  // rotação simples a direita, pois o FB do filho
+                          // tem sinal igual
       } else {
         printf("RDD %d -> ", no->valor);
         rdd(arvore, no);  // rotação dupla a direita, pois o FB do filho tem
@@ -123,8 +116,8 @@ void balanceamento(Arvore* arvore, No* no) {
       // rotação para a esquerda
       if (fb(no->direita) < 0) {
         printf("RSE %d -> ", no->valor);
-        rse(arvore, no, true);  // rotação simples a esquerda, pois o FB do
-                                // filho tem sinal igual
+        rse(arvore, no);  // rotação simples a esquerda, pois o FB do
+                          // filho tem sinal igual
       } else {
         printf("RDE %d -> ", no->valor);
         rde(arvore, no);  // rotação dupla a esquerda, pois o FB do filho tem
@@ -152,8 +145,7 @@ int fb(No* no) {
   return esquerda - direita;
 }
 
-No* rse(Arvore* arvore, No* no, bool makePrint) {
-  clock_t start = clock();
+No* rse(Arvore* arvore, No* no) {
   No* pai = no->pai;
   No* direita = no->direita;
 
@@ -181,13 +173,10 @@ No* rse(Arvore* arvore, No* no, bool makePrint) {
   direita->altura =
       max(altura(direita->esquerda), altura(direita->direita)) + 1;
 
-  if (makePrint)
-    printf("tempo: %.0f Milissegundos\n", (double)(clock() - start));
   return direita;
 }
 
-No* rsd(Arvore* arvore, No* no, bool makePrint) {
-  clock_t start = clock();
+No* rsd(Arvore* arvore, No* no) {
   No* pai = no->pai;
   No* esquerda = no->esquerda;
 
@@ -215,25 +204,17 @@ No* rsd(Arvore* arvore, No* no, bool makePrint) {
   esquerda->altura =
       max(altura(esquerda->esquerda), altura(esquerda->direita)) + 1;
 
-  if (makePrint)
-    printf("tempo: %.0f Milissegundos\n", (double)(clock() - start));
   return esquerda;
 }
 
 No* rde(Arvore* arvore, No* no) {
-  clock_t start = clock();
-  no->direita = rsd(arvore, no->direita, false);
-  No* returner = rse(arvore, no, false);
-  printf("tempo: %.0f Milissegundos\n", (double)(clock() - start));
-  return returner;
+  no->direita = rsd(arvore, no->direita);
+  return rse(arvore, no);
 }
 
 No* rdd(Arvore* arvore, No* no) {
-  clock_t start = clock();
-  no->esquerda = rse(arvore, no->esquerda, false);
-  No* returner = rsd(arvore, no, false);
-  printf("tempo: %.0f Milissegundos\n", (double)(clock() - start));
-  return returner;
+  no->esquerda = rse(arvore, no->esquerda);
+  return rsd(arvore, no);
 }
 
 No* minValorNo(No* no) {
@@ -243,7 +224,6 @@ No* minValorNo(No* no) {
 }
 
 void remover(Arvore* arvore, int valor) {
-  clock_t start = clock();
   No* no = localizar(arvore->raiz, valor);
   if (no == NULL) return;
 
@@ -273,38 +253,20 @@ void remover(Arvore* arvore, int valor) {
 
   free(no);
 
-  printf("Removendo %d -> tempo: %.0f Milissegundos\n", valor,
-         (double)(clock() - start));
   balanceamento(arvore, pai);
 }
 
 int main() {
-  clock_t start = clock();
   Arvore* a = criar();
 
   for (int i = 0; i < 10000; i++) {
-    int operacao = rand() % 3;
+    int operacao = 0;
     int valor = rand() % 100000;
 
-    switch (operacao) {
-      case 0:
-        adicionar(a, valor);
-        break;
-      case 1:
-        // remover(a, valor);
-        break;
-      case 2:
-        if (localizar(a->raiz, valor) != NULL) {
-          printf("Valor %d encontrado na arvore.\n", valor);
-        } else {
-          printf("Valor %d nao encontrado na arvore.\n", valor);
-        }
-        break;
-    }
+    adicionar(a, valor);
   }
 
   printf("In-order: ");
-  // percorrer(a->raiz, visitar);
-  printf("\ntempo: %.0f Milissegundos\n", (double)(clock() - start));
+  percorrer(a->raiz, visitar);
   return 0;
 }
