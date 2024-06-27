@@ -336,5 +336,6 @@ int main() {
   }
 
   printf("\nNumero de operacoes: %d\n", contador);
+  printf("\nFIM");
   return 0;
 }
