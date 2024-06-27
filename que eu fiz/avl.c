@@ -16,6 +16,8 @@ typedef struct arvore {
   struct no* raiz;
 } Arvore;
 
+int contador = 0;
+
 void balanceamento(Arvore*, No*);
 int altura(No*);
 int fb(No*);
@@ -24,7 +26,10 @@ No* rse(Arvore*, No*);
 No* rdd(Arvore*, No*);
 No* rde(Arvore*, No*);
 
-int max(int a, int b) { return a > b ? a : b; }
+int max(int a, int b) {
+  contador++;
+  return a > b ? a : b;
+}
 
 Arvore* criar() {
   Arvore* arvore = malloc(sizeof(Arvore));
@@ -33,22 +38,34 @@ Arvore* criar() {
   return arvore;
 }
 
-int vazia(Arvore* arvore) { return arvore->raiz == NULL; }
+int vazia(Arvore* arvore) {
+  contador++;
+  return arvore->raiz == NULL;
+}
 
 void adicionar(Arvore* arvore, int valor) {
   No* no = arvore->raiz;
 
   while (no != NULL) {
+    contador++;
+
     if (valor > no->valor) {
+      contador++;
+
       if (no->direita != NULL) {
+        contador++;
         no = no->direita;
       } else {
+        contador++;
         break;
       }
     } else {
+      contador++;
       if (no->esquerda != NULL) {
+        contador++;
         no = no->esquerda;
       } else {
+        contador++;
         break;
       }
     }
@@ -62,11 +79,15 @@ void adicionar(Arvore* arvore, int valor) {
   novo->altura = 1;
 
   if (no == NULL) {
+    contador++;
     arvore->raiz = novo;
   } else {
+    contador++;
     if (valor > no->valor) {
+      contador++;
       no->direita = novo;
     } else {
+      contador++;
       no->esquerda = novo;
     }
 
@@ -76,11 +97,14 @@ void adicionar(Arvore* arvore, int valor) {
 
 No* localizar(No* no, int valor) {
   while (no != NULL) {
+    contador++;
     if (no->valor == valor) {
+      contador++;
       return no;
     }
 
     no = valor < no->valor ? no->esquerda : no->direita;
+    contador++;
   }
 
   return NULL;
@@ -88,38 +112,49 @@ No* localizar(No* no, int valor) {
 
 void percorrer(No* no, void (*callback)(int)) {
   if (no != NULL) {
+    contador++;
     percorrer(no->esquerda, callback);
     callback(no->valor);
     percorrer(no->direita, callback);
   }
 }
 
-void visitar(int valor) { printf("%d ", valor); }
+void visitar(int valor) {
+  //   printf("%d ", valor);
+}
 
 void balanceamento(Arvore* arvore, No* no) {
   while (no != NULL) {
+    contador++;
+
     no->altura = max(altura(no->esquerda), altura(no->direita)) + 1;
     int fator = fb(no);
 
     if (fator > 1) {  // árvore mais pesada para esquerda
+      contador++;
       // rotação para a direita
       if (fb(no->esquerda) > 0) {
-        printf("RSD %d -> ", no->valor);
+        contador++;
+        // printf("RSD %d -> ", no->valor);
         rsd(arvore, no);  // rotação simples a direita, pois o FB do filho
                           // tem sinal igual
       } else {
-        printf("RDD %d -> ", no->valor);
+        contador++;
+        // printf("RDD %d -> ", no->valor);
         rdd(arvore, no);  // rotação dupla a direita, pois o FB do filho tem
                           // sinal diferente
       }
     } else if (fator < -1) {  // árvore mais pesada para a direita
+      contador++;
       // rotação para a esquerda
       if (fb(no->direita) < 0) {
-        printf("RSE %d -> ", no->valor);
+        contador++;
+        // printf("RSE %d -> ", no->valor);
         rse(arvore, no);  // rotação simples a esquerda, pois o FB do
                           // filho tem sinal igual
       } else {
-        printf("RDE %d -> ", no->valor);
+        contador++;
+        // printf("RDE %d -> ", no->valor);
         rde(arvore, no);  // rotação dupla a esquerda, pois o FB do filho tem
                           // sinal diferente
       }
@@ -129,16 +164,21 @@ void balanceamento(Arvore* arvore, No* no) {
   }
 }
 
-int altura(No* no) { return no != NULL ? no->altura : 0; }
+int altura(No* no) {
+  contador++;
+  return no != NULL ? no->altura : 0;
+}
 
 int fb(No* no) {
   int esquerda = 0, direita = 0;
 
   if (no->esquerda != NULL) {
+    contador++;
     esquerda = no->esquerda->altura;
   }
 
   if (no->direita != NULL) {
+    contador++;
     direita = no->direita->altura;
   }
 
@@ -150,6 +190,7 @@ No* rse(Arvore* arvore, No* no) {
   No* direita = no->direita;
 
   if (direita->esquerda != NULL) {
+    contador++;
     direita->esquerda->pai = no;
   }
 
@@ -160,11 +201,15 @@ No* rse(Arvore* arvore, No* no) {
   direita->pai = pai;
 
   if (pai == NULL) {
+    contador++;
     arvore->raiz = direita;
   } else {
+    contador++;
     if (pai->esquerda == no) {
+      contador++;
       pai->esquerda = direita;
     } else {
+      contador++;
       pai->direita = direita;
     }
   }
@@ -181,6 +226,7 @@ No* rsd(Arvore* arvore, No* no) {
   No* esquerda = no->esquerda;
 
   if (esquerda->direita != NULL) {
+    contador++;
     esquerda->direita->pai = no;
   }
 
@@ -191,11 +237,14 @@ No* rsd(Arvore* arvore, No* no) {
   esquerda->pai = pai;
 
   if (pai == NULL) {
+    contador++;
     arvore->raiz = esquerda;
   } else {
     if (pai->esquerda == no) {
+      contador++;
       pai->esquerda = esquerda;
     } else {
+      contador++;
       pai->direita = esquerda;
     }
   }
@@ -219,7 +268,10 @@ No* rdd(Arvore* arvore, No* no) {
 
 No* minValorNo(No* no) {
   No* atual = no;
-  while (atual->esquerda != NULL) atual = atual->esquerda;
+  while (atual->esquerda != NULL) {
+    contador++;
+    atual = atual->esquerda;
+  };
   return atual;
 }
 
@@ -231,20 +283,29 @@ void remover(Arvore* arvore, int valor) {
   No* substituto;
 
   if (no->esquerda == NULL || no->direita == NULL) {
+    contador++;
     substituto = no->esquerda ? no->esquerda : no->direita;
 
-    if (substituto != NULL) substituto->pai = pai;
+    if (substituto != NULL) {
+      contador++;
+      substituto->pai = pai;
+    };
 
     if (pai == NULL) {
       arvore->raiz = substituto;
+      contador++;
     } else {
+      contador++;
       if (no == pai->esquerda) {
+        contador++;
         pai->esquerda = substituto;
       } else {
+        contador++;
         pai->direita = substituto;
       }
     }
   } else {
+    contador++;
     No* sucessor = minValorNo(no->direita);
     no->valor = sucessor->valor;
     remover(arvore, sucessor->valor);
@@ -257,16 +318,23 @@ void remover(Arvore* arvore, int valor) {
 }
 
 int main() {
-  Arvore* a = criar();
+  printf("\nIniciando código: %d\n", contador);
 
-  for (int i = 0; i < 10000; i++) {
-    int operacao = 0;
-    int valor = rand() % 100000;
+  for (int j = 0; j < 30; j++) {
+    Arvore* a = criar();
+    sleep(1);
+    srand(time(0));
 
-    adicionar(a, valor);
+    for (int i = 0; i < 10000; i++) {
+      int operacao = 0;
+      int valor = rand() % 10000;
+
+      adicionar(a, valor);
+    }
+
+    printf("\nNumero de iteracoes atual: %d\n", contador);
   }
 
-  printf("In-order: ");
-  percorrer(a->raiz, visitar);
+  printf("\nNumero de operacoes: %d\n", contador);
   return 0;
 }
